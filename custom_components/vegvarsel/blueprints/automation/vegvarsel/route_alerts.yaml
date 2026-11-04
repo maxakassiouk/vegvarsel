@@ -1,0 +1,233 @@
+blueprint:
+  name: Vegvarsel - Route alerts
+  description: |-
+    # Vegvarsel - Route alerts
+
+    Push notifications about Statens vegvesen traffic messages on your Vegvarsel routes.
+
+    **When**
+    - **Live**: the moment something new turns up on the route inside one of its watch windows - and when it gets worse or clears
+    - **When a window opens**: a summary of what lies over the trip (optionally an "all clear")
+    - **The evening before**: a preview of tomorrow's trips, if set on the route
+
+    The route's own days, watch windows and evening preview decide when anything is sent - edit them under Settings → Devices & services → Vegvarsel.
+
+    <details>
+    <summary><b>Template variables</b></summary>
+
+    Every message has `route`, `type` (`new`, `updated`, `cleared` or `digest`).
+
+    A single incident: `summary`, `kind` (`closed`, `accident`, `convoy`, `obstruction`, `traffic`, `restriction`, `roadworks`, `conditions`, `info`), `kind_name`, `road`, `description`, `distance_km` (along the route), `start`, `end`, `applies_now`, `latitude`, `longitude`, `id`.
+
+    A digest: `reason` (`window_start` or `evening_preview`), `count`, `incidents` (a list of the above), `summary` (one line per incident).
+    </details>
+  domain: automation
+  source_url: https://github.com/maxakassiouk/vegvarsel/blob/main/custom_components/vegvarsel/blueprints/automation/vegvarsel/route_alerts.yaml
+  input:
+    scope:
+      name: What to send
+      icon: mdi:road-variant
+      input:
+        routes:
+          name: Routes
+          description: Leave empty for all Vegvarsel routes.
+          default: []
+          selector:
+            device:
+              multiple: true
+              filter:
+                integration: vegvarsel
+        kinds:
+          name: Kinds of incident
+          description: Leave empty for every kind.
+          default: []
+          selector:
+            select:
+              multiple: true
+              mode: dropdown
+              options:
+                - label: Road closed
+                  value: closed
+                - label: Accident
+                  value: accident
+                - label: Convoy driving
+                  value: convoy
+                - label: Obstruction (vehicle, rockfall, avalanche...)
+                  value: obstruction
+                - label: Queues
+                  value: traffic
+                - label: Restriction (lanes, manual traffic control...)
+                  value: restriction
+                - label: Roadworks
+                  value: roadworks
+                - label: Driving conditions
+                  value: conditions
+                - label: Other traffic message
+                  value: info
+        send_live:
+          name: Live alerts
+          description: New, worse and (below) cleared incidents inside a watch window.
+          default: true
+          selector:
+            boolean: {}
+        send_cleared:
+          name: Tell me when an incident clears
+          default: true
+          selector:
+            boolean: {}
+        send_window_start:
+          name: Summary when a watch window opens
+          default: true
+          selector:
+            boolean: {}
+        send_preview:
+          name: Evening preview
+          default: true
+          selector:
+            boolean: {}
+        send_all_clear:
+          name: Send summaries when nothing is wrong too
+          description: An "all clear" when the window opens or in the evening.
+          default: false
+          selector:
+            boolean: {}
+    mobile:
+      name: Phones
+      icon: mdi:cellphone-message
+      input:
+        notify_devices:
+          name: Devices running the Home Assistant app
+          default: []
+          selector:
+            device:
+              multiple: true
+              filter:
+                integration: mobile_app
+        critical_closures:
+          name: Critical alert for closures and accidents
+          description: Breaks through silent mode / Do Not Disturb (iOS critical alert, Android high priority alarm stream).
+          default: false
+          selector:
+            boolean: {}
+    other:
+      name: Elsewhere
+      icon: mdi:bell-ring-outline
+      collapsed: true
+      input:
+        show_in_notifications:
+          name: Also show in Home Assistant's notifications
+          default: false
+          selector:
+            boolean: {}
+        user_actions:
+          name: Additional actions
+          description: Anything else - Telegram, a TTS announcement, a light. The variables above are in scope, plus `title` and `message`.
+          default: []
+          selector:
+            action: {}
+
+mode: queued
+max: 20
+
+triggers:
+  - trigger: event
+    event_type: vegvarsel_incident_new
+    id: new
+  - trigger: event
+    event_type: vegvarsel_incident_updated
+    id: updated
+  - trigger: event
+    event_type: vegvarsel_incident_cleared
+    id: cleared
+  - trigger: event
+    event_type: vegvarsel_digest
+    id: digest
+
+variables:
+  in_routes: !input routes
+  in_kinds: !input kinds
+  in_live: !input send_live
+  in_cleared: !input send_cleared
+  in_window_start: !input send_window_start
+  in_preview: !input send_preview
+  in_all_clear: !input send_all_clear
+  in_critical: !input critical_closures
+  in_bell: !input show_in_notifications
+
+  type: "{{ trigger.id }}"
+  d: "{{ trigger.event.data }}"
+  route: "{{ d.route }}"
+  route_ok: "{{ not in_routes or d.device_id in in_routes }}"
+
+  # a single incident
+  id: "{{ d.id | default('') }}"
+  kind: "{{ d.kind | default('') }}"
+  kind_name: "{{ d.kind_name | default('') }}"
+  summary: "{{ d.summary | default('') }}"
+  road: "{{ d.road | default('') }}"
+  description: "{{ d.description | default('') }}"
+  distance_km: "{{ d.distance_km | default('') }}"
+  start: "{{ d.start | default('') }}"
+  end: "{{ d.end | default('') }}"
+  applies_now: "{{ d.applies_now | default(false) }}"
+
+  # a digest
+  reason: "{{ d.reason | default('') }}"
+  incidents: >-
+    {% set all = d.incidents | default([]) %}
+    {{ (all | selectattr('kind', 'in', in_kinds) | list) if in_kinds else all }}
+  count: "{{ incidents | count }}"
+
+  wanted: >-
+    {% if not route_ok %}false
+    {% elif type in ['new', 'updated'] %}{{ in_live and (not in_kinds or kind in in_kinds) }}
+    {% elif type == 'cleared' %}{{ in_live and in_cleared and (not in_kinds or kind in in_kinds) }}
+    {% elif reason == 'window_start' %}{{ in_window_start and (count | int > 0 or in_all_clear) }}
+    {% elif reason == 'evening_preview' %}{{ in_preview and (count | int > 0 or in_all_clear) }}
+    {% else %}false{% endif %}
+
+  title: >-
+    {% if type == 'new' %}🚧 {{ route }}: {{ kind_name }}
+    {% elif type == 'updated' %}⚠️ {{ route }}: now {{ kind_name | lower }}
+    {% elif type == 'cleared' %}✅ {{ route }}: cleared
+    {% elif reason == 'evening_preview' %}{{ '🌙' if count | int > 0 else '✅' }} Tomorrow, {{ route }}
+    {% else %}{{ '🚧' if count | int > 0 else '✅' }} {{ route }}{% endif %}
+  message: >-
+    {% if type in ['new', 'updated', 'cleared'] %}{{ summary }}{{ ' (km ' ~ distance_km ~ ')' if distance_km != '' else '' }}
+    {%- if type != 'cleared' and not applies_now and start %}
+    From {{ as_timestamp(start) | timestamp_custom('%a %H:%M') }}{% endif %}
+    {% elif count | int == 0 %}Nothing reported on the route.
+    {% else %}{% for i in incidents %}• {{ i.summary }}
+    {% endfor %}{% endif %}
+  urgent: "{{ in_critical and type in ['new', 'updated'] and kind in ['closed', 'accident'] }}"
+  tag: "vegvarsel_{{ id if id else (d.route_id ~ '_' ~ reason) }}"
+
+conditions:
+  - condition: template
+    value_template: "{{ wanted }}"
+
+actions:
+  - repeat:
+      for_each: !input notify_devices
+      sequence:
+        - action: "notify.mobile_app_{{ device_attr(repeat.item, 'name') | slugify }}"
+          data:
+            title: "{{ title }}"
+            message: "{{ message }}"
+            data: >-
+              {% set base = {'tag': tag, 'group': 'vegvarsel'} %}
+              {% if urgent %}
+              {{ dict(base, push={'sound': {'name': 'default', 'critical': 1, 'volume': 1.0}},
+                      ttl=0, priority='high', channel='alarm_stream') }}
+              {% else %}{{ base }}{% endif %}
+          continue_on_error: true
+  - if:
+      - condition: template
+        value_template: "{{ in_bell }}"
+    then:
+      - action: persistent_notification.create
+        data:
+          title: "{{ title }}"
+          message: "{{ message }}"
+          notification_id: "{{ tag }}"
+  - sequence: !input user_actions

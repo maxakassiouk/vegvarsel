@@ -1,0 +1,21 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+# Real DATEX responses can be large and are fetched with personal credentials.
+tests/fixtures/live_*.xml
+tools/.demo_cache/
+dist/
+# Private planning notes and local Home Assistant configuration.
+docs/superpowers/
+.env
+.env.*
+!.env.example
+.storage/
+secrets.yaml
+configuration.yaml
+known_devices.yaml
+home-assistant*.log*

@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  SYNTHETIC test data in the shape of a DATEX II v3 SituationPublication.
+  Written by hand around real coordinates near Ålesund, before access to the
+  live Statens vegvesen feed was granted. Replace or complement with a recorded
+  live sample (tests/fixtures/live_*.xml is git-ignored) once available.
+-->
+<d2:payload xmlns:d2="http://datex2.eu/schema/3/d2Payload"
+            xmlns:sit="http://datex2.eu/schema/3/situation"
+            xmlns:com="http://datex2.eu/schema/3/common"
+            xmlns:loc="http://datex2.eu/schema/3/locationReferencing"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:type="sit:SituationPublication" lang="no" modelBaseVersion="3">
+  <com:publicationTime>2026-11-03T20:00:00+01:00</com:publicationTime>
+
+  <!-- 1. Night closures of Ellingsøytunnelen for maintenance, Mon-Thu nights, for three weeks. -->
+  <sit:situation id="NPRA_SYN_ELL_NIGHT">
+    <sit:overallSeverity>high</sit:overallSeverity>
+    <sit:situationRecord xsi:type="sit:RoadOrCarriagewayOrLaneManagement" id="NPRA_SYN_ELL_NIGHT_1" version="3">
+      <sit:situationRecordCreationTime>2026-10-20T10:00:00+02:00</sit:situationRecordCreationTime>
+      <sit:situationRecordVersionTime>2026-10-28T09:00:00+01:00</sit:situationRecordVersionTime>
+      <sit:probabilityOfOccurrence>certain</sit:probabilityOfOccurrence>
+      <sit:severity>high</sit:severity>
+      <sit:validity>
+        <com:validityStatus>definedByValidityTimeSpec</com:validityStatus>
+        <com:validityTimeSpecification>
+          <com:overallStartTime>2026-11-02T00:00:00+01:00</com:overallStartTime>
+          <com:overallEndTime>2026-11-20T06:00:00+01:00</com:overallEndTime>
+          <com:validPeriod>
+            <com:recurringTimePeriodOfDay xsi:type="com:TimePeriodByHour">
+              <com:startTimeOfPeriod>22:00:00</com:startTimeOfPeriod>
+              <com:endTimeOfPeriod>06:00:00</com:endTimeOfPeriod>
+            </com:recurringTimePeriodOfDay>
+            <com:recurringDayWeekMonthPeriod>
+              <com:applicableDay>monday</com:applicableDay>
+              <com:applicableDay>tuesday</com:applicableDay>
+              <com:applicableDay>wednesday</com:applicableDay>
+              <com:applicableDay>thursday</com:applicableDay>
+            </com:recurringDayWeekMonthPeriod>
+          </com:validPeriod>
+        </com:validityTimeSpecification>
+      </sit:validity>
+      <sit:generalPublicComment>
+        <sit:comment>
+          <com:values>
+            <com:value lang="no">Ellingsøytunnelen er stengt om natta på grunn av vedlikehald. Ingen omkøyring.</com:value>
+            <com:value lang="en">Ellingsøy tunnel is closed at night due to maintenance. No detour.</com:value>
+          </com:values>
+        </sit:comment>
+      </sit:generalPublicComment>
+      <sit:locationReference xsi:type="loc:SingleRoadLinearLocation">
+        <loc:roadInformation>
+          <loc:roadNumber>Fv658</loc:roadNumber>
+          <loc:roadName>Ellingsøytunnelen</loc:roadName>
+        </loc:roadInformation>
+        <loc:tpegLinearLocation>
+          <loc:tpegDirection>bothWays</loc:tpegDirection>
+          <loc:from xsi:type="loc:TpegNonJunctionPoint">
+            <loc:pointCoordinates>
+              <loc:latitude>62.4738</loc:latitude>
+              <loc:longitude>6.1765</loc:longitude>
+            </loc:pointCoordinates>
+            <loc:name><loc:tpegOtherPointDescriptor><loc:descriptor><com:values><com:value lang="no">Hessa</com:value></com:values></loc:descriptor></loc:tpegOtherPointDescriptor></loc:name>
+          </loc:from>
+          <loc:to xsi:type="loc:TpegNonJunctionPoint">
+            <loc:pointCoordinates>
+              <loc:latitude>62.4915</loc:latitude>
+              <loc:longitude>6.1797</loc:longitude>
+            </loc:pointCoordinates>
+            <loc:name><loc:tpegOtherPointDescriptor><loc:descriptor><com:values><com:value lang="no">Ellingsøya</com:value></com:values></loc:descriptor></loc:tpegOtherPointDescriptor></loc:name>
+          </loc:to>
+        </loc:tpegLinearLocation>
+      </sit:locationReference>
+      <sit:roadOrCarriagewayOrLaneManagementType>roadClosed</sit:roadOrCarriagewayOrLaneManagementType>
+    </sit:situationRecord>
+  </sit:situation>
+
+  <!-- 2. Accident in Ellingsøytunnelen on Wednesday morning. -->
+  <sit:situation id="NPRA_SYN_ELL_ACC">
+    <sit:situationRecord xsi:type="sit:Accident" id="NPRA_SYN_ELL_ACC_1" version="1">
+      <sit:situationRecordVersionTime>2026-11-04T07:06:00+01:00</sit:situationRecordVersionTime>
+      <sit:severity>highest</sit:severity>
+      <sit:validity>
+        <com:validityStatus>active</com:validityStatus>
+        <com:validityTimeSpecification>
+          <com:overallStartTime>2026-11-04T07:05:00+01:00</com:overallStartTime>
+        </com:validityTimeSpecification>
+      </sit:validity>
+      <sit:generalPublicComment>
+        <sit:comment><com:values><com:value lang="no">Trafikkulykke i Ellingsøytunnelen. Tunnelen er midlertidig stengt.</com:value></com:values></sit:comment>
+      </sit:generalPublicComment>
+      <sit:locationReference xsi:type="loc:PointLocation">
+        <loc:pointByCoordinates>
+          <loc:pointCoordinates>
+            <loc:latitude>62.486635</loc:latitude>
+            <loc:longitude>6.182149</loc:longitude>
+          </loc:pointCoordinates>
+        </loc:pointByCoordinates>
+      </sit:locationReference>
+      <sit:accidentType>accident</sit:accidentType>
+    </sit:situationRecord>
+  </sit:situation>
+
+  <!-- 3. Roadworks on a parallel road ~340 m from the route: must NOT match a 150 m corridor. -->
+  <sit:situation id="NPRA_SYN_PARALLEL">
+    <sit:situationRecord xsi:type="sit:MaintenanceWorks" id="NPRA_SYN_PARALLEL_1" version="1">
+      <sit:validity>
+        <com:validityStatus>active</com:validityStatus>
+        <com:validityTimeSpecification>
+          <com:overallStartTime>2026-11-01T07:00:00+01:00</com:overallStartTime>
+          <com:overallEndTime>2026-11-30T16:00:00+01:00</com:overallEndTime>
+        </com:validityTimeSpecification>
+      </sit:validity>
+      <sit:generalPublicComment>
+        <sit:comment><com:values><com:value lang="no">Vegarbeid. Lysregulering.</com:value></com:values></sit:comment>
+      </sit:generalPublicComment>
+      <sit:locationReference xsi:type="loc:PointLocation">
+        <loc:pointByCoordinates>
+          <loc:pointCoordinates>
+            <loc:latitude>62.4866</loc:latitude>
+            <loc:longitude>6.1890</loc:longitude>
+          </loc:pointCoordinates>
+        </loc:pointByCoordinates>
+      </sit:locationReference>
+      <sit:roadMaintenanceType>roadworks</sit:roadMaintenanceType>
+    </sit:situationRecord>
+  </sit:situation>
+
+  <!-- 4. A closure in Oslo: far from the route. -->
+  <sit:situation id="NPRA_SYN_OSLO">
+    <sit:situationRecord xsi:type="sit:RoadOrCarriagewayOrLaneManagement" id="NPRA_SYN_OSLO_1" version="1">
+      <sit:validity><com:validityStatus>active</com:validityStatus></sit:validity>
+      <sit:locationReference xsi:type="loc:PointLocation">
+        <loc:pointByCoordinates>
+          <loc:pointCoordinates><loc:latitude>59.9100</loc:latitude><loc:longitude>10.7500</loc:longitude></loc:pointCoordinates>
+        </loc:pointByCoordinates>
+      </sit:locationReference>
+      <sit:roadOrCarriagewayOrLaneManagementType>roadClosed</sit:roadOrCarriagewayOrLaneManagementType>
+    </sit:situationRecord>
+  </sit:situation>
+
+  <!-- 5. Convoy driving in Valderøytunnelen, located by a GML line. -->
+  <sit:situation id="NPRA_SYN_VAL_CONVOY">
+    <sit:situationRecord xsi:type="sit:GeneralNetworkManagement" id="NPRA_SYN_VAL_CONVOY_1" version="2">
+      <sit:validity>
+        <com:validityStatus>definedByValidityTimeSpec</com:validityStatus>
+        <com:validityTimeSpecification>
+          <com:overallStartTime>2026-11-05T06:00:00+01:00</com:overallStartTime>
+          <com:overallEndTime>2026-11-05T09:00:00+01:00</com:overallEndTime>
+        </com:validityTimeSpecification>
+      </sit:validity>
+      <sit:generalPublicComment>
+        <sit:comment><com:values><com:value lang="no">Kolonnekøyring gjennom Valderøytunnelen.</com:value></com:values></sit:comment>
+      </sit:generalPublicComment>
+      <sit:locationReference xsi:type="loc:SingleRoadLinearLocation">
+        <loc:roadInformation><loc:roadNumber>Fv658</loc:roadNumber></loc:roadInformation>
+        <loc:gmlLineString srsName="EPSG:4326">
+          <loc:posList>62.5115 6.1006 62.5160 6.1002 62.5210 6.0999</loc:posList>
+        </loc:gmlLineString>
+      </sit:locationReference>
+      <sit:generalNetworkManagementType>convoyService</sit:generalNetworkManagementType>
+    </sit:situationRecord>
+  </sit:situation>
+
+  <!-- 6. A suspended closure on the route: must be ignored. -->
+  <sit:situation id="NPRA_SYN_SUSPENDED">
+    <sit:situationRecord xsi:type="sit:RoadOrCarriagewayOrLaneManagement" id="NPRA_SYN_SUSPENDED_1" version="1">
+      <sit:validity><com:validityStatus>suspended</com:validityStatus></sit:validity>
+      <sit:locationReference xsi:type="loc:PointLocation">
+        <loc:pointByCoordinates>
+          <loc:pointCoordinates><loc:latitude>62.486635</loc:latitude><loc:longitude>6.182149</loc:longitude></loc:pointCoordinates>
+        </loc:pointByCoordinates>
+      </sit:locationReference>
+      <sit:roadOrCarriagewayOrLaneManagementType>roadClosed</sit:roadOrCarriagewayOrLaneManagementType>
+    </sit:situationRecord>
+  </sit:situation>
+</d2:payload>

@@ -1,0 +1,23 @@
+[project]
+name = "vegvarsel"
+version = "0.2.1"
+description = "Home Assistant integration: Norwegian road incidents (Statens vegvesen DATEX II) along your own routes."
+requires-python = ">=3.13"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+
+[tool.ruff]
+line-length = 110
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "B", "UP", "I"]
+ignore = ["E501"]
+
+[tool.ruff.lint.isort]
+force-sort-within-sections = true
+combine-as-imports = true
+known-first-party = ["custom_components.vegvarsel"]

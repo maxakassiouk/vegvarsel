@@ -1,0 +1,214 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Statens vegvesen DATEX account",
+        "description": "Vegvarsel reads Statens vegvesen's official traffic messages (DATEX II). Access is free, but you have to request a username and password first: {access_url}",
+        "data": {
+          "username": "DATEX username",
+          "password": "DATEX password"
+        },
+        "sections": {
+          "advanced": {
+            "name": "Advanced",
+            "data": {
+              "url": "Feed address"
+            },
+            "data_description": {
+              "url": "Leave as it is. Only for the demo feed (tools/demo_feed.py) or a mirror."
+            }
+          }
+        }
+      },
+      "reauth_confirm": {
+        "title": "DATEX password",
+        "description": "Statens vegvesen no longer accepts the password for {username}.",
+        "data": {
+          "password": "DATEX password"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Statens vegvesen refused the username or password.",
+      "cannot_connect": "The DATEX feed did not answer. Try again in a moment."
+    },
+    "abort": {
+      "already_configured": "This DATEX account is already set up. Add routes to it instead.",
+      "reauth_successful": "The new password works."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Polling",
+        "data": {
+          "scan_minutes": "Check for new traffic messages every"
+        },
+        "data_description": {
+          "scan_minutes": "Vegvarsel also checks at the exact minute a watch window opens and an evening preview is due, whatever this is set to."
+        }
+      }
+    }
+  },
+  "config_subentries": {
+    "route": {
+      "entry_type": "Route",
+      "initiate_flow": {
+        "user": "Add route",
+        "reconfigure": "Edit route"
+      },
+      "step": {
+        "user": {
+          "title": "New route",
+          "data": {
+            "name": "Name"
+          }
+        },
+        "start": {
+          "title": "Where does the route start?",
+          "menu_options": {
+            "start_keep": "Keep the current start",
+            "start_zone": "At a zone",
+            "start_point": "At a point on the map"
+          },
+          "description": "Now: {current}"
+        },
+        "destination": {
+          "title": "Where does the route end?",
+          "menu_options": {
+            "destination_keep": "Keep the current destination",
+            "destination_zone": "At a zone",
+            "destination_point": "At a point on the map"
+          },
+          "description": "Now: {current}"
+        },
+        "start_zone": {
+          "title": "Start",
+          "data": {
+            "zone": "Zone"
+          }
+        },
+        "destination_zone": {
+          "title": "Destination",
+          "data": {
+            "zone": "Zone"
+          }
+        },
+        "start_point": {
+          "title": "Start",
+          "data": {
+            "location": "Location"
+          }
+        },
+        "destination_point": {
+          "title": "Destination",
+          "data": {
+            "location": "Location"
+          }
+        },
+        "vias": {
+          "title": "Via points ({count})",
+          "description": "The route is worked out as the fastest drive. If you take another road, add a point on it so the route follows it.",
+          "menu_options": {
+            "via": "Add a via point",
+            "vias_clear": "Remove all via points",
+            "review": "Work out the route"
+          }
+        },
+        "via": {
+          "title": "Via point",
+          "data": {
+            "location": "Location"
+          }
+        },
+        "review": {
+          "title": "The route",
+          "description": "{start} → {destination} ({vias} via points): {km} km, about {minutes} min without traffic.\n\nCheck it is the road you drive: [open on OpenStreetMap]({map_url})"
+        },
+        "settings": {
+          "title": "When do you drive it?",
+          "description": "Vegvarsel tells you about what lies over your next trip. Live alerts are sent inside the watch windows, a summary when each window opens, and an optional preview the evening before.",
+          "data": {
+            "corridor_m": "Corridor",
+            "days": "Days",
+            "windows": "Watch windows",
+            "preview": "Evening preview at"
+          },
+          "data_description": {
+            "corridor_m": "How far from the route a traffic message may be and still count.",
+            "windows": "One window per field, as HH:MM-HH:MM (e.g. 06:30-08:00); use “Add” for another. Start the window when you would want to know before leaving. Leave empty to watch around the clock.",
+            "preview": "Leave empty for no evening preview."
+          }
+        },
+        "reconfigure_settings": {
+          "title": "Edit route",
+          "data": {
+            "name": "Name",
+            "corridor_m": "Corridor",
+            "days": "Days",
+            "windows": "Watch windows",
+            "preview": "Evening preview at",
+            "recalculate": "Work the route out again"
+          },
+          "data_description": {
+            "windows": "One window per field, as HH:MM-HH:MM; use “Add” for another. Leave empty to watch around the clock.",
+            "recalculate": "Asks the route planner again with the same start, via points and destination."
+          }
+        },
+        "reconfigure": {
+          "title": "Edit {name}",
+          "description": "What do you want to change?",
+          "menu_options": {
+            "reconfigure_settings": "Schedule, corridor and name",
+            "reconfigure_route": "The route itself (start, destination, via points)"
+          }
+        }
+      },
+      "error": {
+        "zone_without_position": "That zone has no position.",
+        "invalid_window": "Write each window as HH:MM-HH:MM, e.g. 06:30-08:00.",
+        "invalid_time": "Not a time.",
+        "no_days": "Pick at least one day.",
+        "no_route": "The route planner found no route."
+      },
+      "abort": {
+        "no_route": "The route planner found no route: {error}"
+      }
+    }
+  },
+  "selector": {
+    "weekday": {
+      "options": {
+        "mon": "Monday",
+        "tue": "Tuesday",
+        "wed": "Wednesday",
+        "thu": "Thursday",
+        "fri": "Friday",
+        "sat": "Saturday",
+        "sun": "Sunday"
+      }
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "problem": {
+        "name": "Problem on route"
+      }
+    },
+    "sensor": {
+      "incidents": {
+        "name": "Incidents",
+        "unit_of_measurement": "incidents"
+      },
+      "next_closure": {
+        "name": "Next closure"
+      }
+    }
+  },
+  "issues": {
+    "feed_failing": {
+      "title": "Vegvarsel cannot read the traffic feed",
+      "description": "The DATEX feed from Statens vegvesen has failed {count} times in a row ({reason}). Route alerts are paused until it answers again."
+    }
+  }
+}

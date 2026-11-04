@@ -1,0 +1,214 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "DATEX-konto hos Statens vegvesen",
+        "description": "Vegvarsel leser de offisielle trafikkmeldingene fra Statens vegvesen (DATEX II). Tilgangen er gratis, men du må først be om brukernavn og passord: {access_url}",
+        "data": {
+          "username": "DATEX-brukernavn",
+          "password": "DATEX-passord"
+        },
+        "sections": {
+          "advanced": {
+            "name": "Avansert",
+            "data": {
+              "url": "Adresse til trafikkmeldingene"
+            },
+            "data_description": {
+              "url": "La stå som den er. Bare for demo-feeden (tools/demo_feed.py) eller en speiling."
+            }
+          }
+        }
+      },
+      "reauth_confirm": {
+        "title": "DATEX-passord",
+        "description": "Statens vegvesen godtar ikke lenger passordet for {username}.",
+        "data": {
+          "password": "DATEX-passord"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Statens vegvesen avviste brukernavnet eller passordet.",
+      "cannot_connect": "DATEX-tjenesten svarte ikke. Prøv igjen om litt."
+    },
+    "abort": {
+      "already_configured": "Denne DATEX-kontoen er allerede satt opp. Legg heller til ruter under den.",
+      "reauth_successful": "Det nye passordet virker."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Henting",
+        "data": {
+          "scan_minutes": "Se etter nye trafikkmeldinger hvert"
+        },
+        "data_description": {
+          "scan_minutes": "Vegvarsel ser også etter i det minuttet et overvåkingsvindu åpner og når kveldsvarselet skal sendes, uansett hva dette er satt til."
+        }
+      }
+    }
+  },
+  "config_subentries": {
+    "route": {
+      "entry_type": "Rute",
+      "initiate_flow": {
+        "user": "Legg til rute",
+        "reconfigure": "Endre rute"
+      },
+      "step": {
+        "user": {
+          "title": "Ny rute",
+          "data": {
+            "name": "Navn"
+          }
+        },
+        "start": {
+          "title": "Hvor starter ruten?",
+          "menu_options": {
+            "start_keep": "Behold nåværende start",
+            "start_zone": "I en sone",
+            "start_point": "I et punkt på kartet"
+          },
+          "description": "Nå: {current}"
+        },
+        "destination": {
+          "title": "Hvor slutter ruten?",
+          "menu_options": {
+            "destination_keep": "Behold nåværende mål",
+            "destination_zone": "I en sone",
+            "destination_point": "I et punkt på kartet"
+          },
+          "description": "Nå: {current}"
+        },
+        "start_zone": {
+          "title": "Start",
+          "data": {
+            "zone": "Sone"
+          }
+        },
+        "destination_zone": {
+          "title": "Mål",
+          "data": {
+            "zone": "Sone"
+          }
+        },
+        "start_point": {
+          "title": "Start",
+          "data": {
+            "location": "Posisjon"
+          }
+        },
+        "destination_point": {
+          "title": "Mål",
+          "data": {
+            "location": "Posisjon"
+          }
+        },
+        "vias": {
+          "title": "Via-punkter ({count})",
+          "description": "Ruten regnes ut som den raskeste kjøreturen. Kjører du en annen veg, legg til et punkt på den, så følger ruten den.",
+          "menu_options": {
+            "via": "Legg til et via-punkt",
+            "vias_clear": "Fjern alle via-punkter",
+            "review": "Regn ut ruten"
+          }
+        },
+        "via": {
+          "title": "Via-punkt",
+          "data": {
+            "location": "Posisjon"
+          }
+        },
+        "review": {
+          "title": "Ruten",
+          "description": "{start} → {destination} ({vias} via-punkter): {km} km, omtrent {minutes} min uten trafikk.\n\nSjekk at det er vegen du kjører: [åpne i OpenStreetMap]({map_url})"
+        },
+        "settings": {
+          "title": "Når kjører du den?",
+          "description": "Vegvarsel varsler om det som berører neste tur. Varsler sendes fortløpende innenfor overvåkingsvinduene, et sammendrag når hvert vindu åpner, og eventuelt et varsel kvelden før.",
+          "data": {
+            "corridor_m": "Korridor",
+            "days": "Dager",
+            "windows": "Overvåkingsvinduer",
+            "preview": "Kveldsvarsel kl."
+          },
+          "data_description": {
+            "corridor_m": "Hvor langt fra ruten en trafikkmelding kan være og fortsatt telle med.",
+            "windows": "Ett vindu per felt, som TT:MM-TT:MM (f.eks. 06:30-08:00); bruk «Legg til» for flere. La vinduet starte når du vil vite det før du drar. La stå tomt for å overvåke hele døgnet.",
+            "preview": "La stå tomt for ikke å få kveldsvarsel."
+          }
+        },
+        "reconfigure_settings": {
+          "title": "Endre rute",
+          "data": {
+            "name": "Navn",
+            "corridor_m": "Korridor",
+            "days": "Dager",
+            "windows": "Overvåkingsvinduer",
+            "preview": "Kveldsvarsel kl.",
+            "recalculate": "Regn ut ruten på nytt"
+          },
+          "data_description": {
+            "windows": "Ett vindu per felt, som TT:MM-TT:MM; bruk «Legg til» for flere. La stå tomt for å overvåke hele døgnet.",
+            "recalculate": "Spør ruteplanleggeren på nytt med samme start, via-punkter og mål."
+          }
+        },
+        "reconfigure": {
+          "title": "Endre {name}",
+          "description": "Hva vil du endre?",
+          "menu_options": {
+            "reconfigure_settings": "Tider, korridor og navn",
+            "reconfigure_route": "Selve ruten (start, mål, via-punkter)"
+          }
+        }
+      },
+      "error": {
+        "zone_without_position": "Den sonen har ingen posisjon.",
+        "invalid_window": "Skriv hvert vindu som TT:MM-TT:MM, f.eks. 06:30-08:00.",
+        "invalid_time": "Ikke et klokkeslett.",
+        "no_days": "Velg minst én dag.",
+        "no_route": "Ruteplanleggeren fant ingen rute."
+      },
+      "abort": {
+        "no_route": "Ruteplanleggeren fant ingen rute: {error}"
+      }
+    }
+  },
+  "selector": {
+    "weekday": {
+      "options": {
+        "mon": "Mandag",
+        "tue": "Tirsdag",
+        "wed": "Onsdag",
+        "thu": "Torsdag",
+        "fri": "Fredag",
+        "sat": "Lørdag",
+        "sun": "Søndag"
+      }
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "problem": {
+        "name": "Problem på ruten"
+      }
+    },
+    "sensor": {
+      "incidents": {
+        "name": "Hendelser",
+        "unit_of_measurement": "hendelser"
+      },
+      "next_closure": {
+        "name": "Neste stenging"
+      }
+    }
+  },
+  "issues": {
+    "feed_failing": {
+      "title": "Vegvarsel får ikke lest trafikkmeldingene",
+      "description": "DATEX-tjenesten til Statens vegvesen har feilet {count} ganger på rad ({reason}). Varsler for rutene er satt på pause til den svarer igjen."
+    }
+  }
+}
